@@ -1,4 +1,5 @@
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>우리집 레시피북</title>
 <style>
   :root {
@@ -162,6 +163,11 @@
     margin-bottom: 2rem;
   }
   .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .toolbar-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
@@ -582,6 +588,18 @@
   }
   .manage-btn:hover { border-color: var(--accent); }
 
+  @media (max-width: 640px) {
+    .wrap { padding: 2rem 1rem 3rem; }
+    .toolbar-row { flex-direction: column; align-items: stretch; }
+    .toolbar-actions { justify-content: flex-start; }
+    .recipe-summary { padding-right: 4.25rem; gap: 0.6rem; }
+    .recipe-tools { top: 0.6rem; right: 0.6rem; }
+    .modal-overlay { padding: 1.5rem 0.75rem; }
+    .modal-panel { padding: 1.35rem; }
+    .field-row { grid-template-columns: 1fr; }
+    .dyn-row input.qty-input { flex: 0 0 40%; }
+  }
+
   @media print {
     .filters, .add-btn, .manage-btn, .recipe-tools, .modal-overlay { display: none; }
     .recipe { break-inside: avoid; box-shadow: none; margin-bottom: 1rem; }
@@ -604,7 +622,7 @@
 
   <div class="toolbar-row">
     <nav class="filters" id="filters"></nav>
-    <div style="display:flex; gap:0.5rem;">
+    <div class="toolbar-actions">
       <button type="button" class="btn-secondary" id="refreshBtn" style="padding:0.55rem 1rem; font-size:0.85rem;">새로고침</button>
       <button type="button" class="manage-btn" id="openCategoryBtn">카테고리 관리</button>
       <button type="button" class="add-btn" id="openAddBtn">+ 새 레시피 추가</button>
