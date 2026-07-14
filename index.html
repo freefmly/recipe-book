@@ -333,19 +333,18 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.45rem;
   }
+  .ingredients li + li { margin-top: 0.45rem; }
   .ingredients li {
     display: flex;
     align-items: baseline;
-    gap: 0.55rem;
     font-size: 0.92rem;
   }
   .qty {
     font-family: var(--font-body);
     font-variant-numeric: tabular-nums;
     color: var(--tab-color, var(--accent));
-    margin-right: 0.35rem;
+    margin-left: 0.55rem;
   }
   .steps ol {
     margin: 0;
@@ -396,7 +395,7 @@
   }
 
   .modal-overlay {
-    position: fixed;
+    position: absolute;
     inset: 0;
     background: rgba(15,17,12,0.5);
     display: flex;
@@ -608,6 +607,7 @@
   <div class="toolbar-row">
     <nav class="filters" id="filters"></nav>
     <div class="toolbar-actions">
+      <button type="button" class="btn-secondary" id="themeToggleBtn" style="padding:0.55rem 1rem; font-size:0.85rem;">다크 모드</button>
       <button type="button" class="btn-secondary" id="refreshBtn" style="padding:0.55rem 1rem; font-size:0.85rem;">새로고침</button>
       <button type="button" class="manage-btn" id="openCategoryBtn">카테고리 관리</button>
       <button type="button" class="add-btn" id="openAddBtn">+ 새 레시피 추가</button>
@@ -1232,7 +1232,7 @@
     detail.className = 'recipe-detail';
     if (!isOpen) detail.hidden = true;
     var ingHtml = r.ingredients.map(function (ing) {
-      return '<li><span class="qty">' + escapeHtml(ing.qty) + '</span>' + escapeHtml(ing.name) + '</li>';
+      return '<li>' + escapeHtml(ing.name) + '<span class="qty">' + escapeHtml(ing.qty) + '</span></li>';
     }).join('');
     var stepHtml = r.steps.map(function (s) { return '<li>' + escapeHtml(s) + '</li>'; }).join('');
     detail.innerHTML =
@@ -1293,6 +1293,7 @@
     stepWrap.innerHTML = '';
     (recipe ? recipe.steps : ['']).forEach(function (s) { stepWrap.appendChild(stepRow(s)); });
 
+    window.scrollTo(0, 0);
     document.getElementById('formOverlay').hidden = false;
     document.getElementById('f-name').focus();
   }
@@ -1362,6 +1363,7 @@
     document.getElementById('confirmError').hidden = true;
     deletingId = recipe.id;
     document.getElementById('confirmText').textContent = '"' + recipe.name + '" 레시피를 삭제합니다. 이 작업은 되돌릴 수 없어요.';
+    window.scrollTo(0, 0);
     document.getElementById('confirmOverlay').hidden = false;
   }
   function closeConfirm() {
@@ -1490,6 +1492,7 @@
   function openCategoryModal() {
     closeCategoryForm();
     renderCategoryList();
+    window.scrollTo(0, 0);
     document.getElementById('categoryOverlay').hidden = false;
   }
   function closeCategoryModal() {
@@ -1556,6 +1559,34 @@
       renderError(err);
     }
   });
+
+  var THEME_KEY = 'home-recipe-book-theme';
+  function currentEffectiveTheme() {
+    var attr = document.documentElement.getAttribute('data-theme');
+    if (attr === 'dark' || attr === 'light') return attr;
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  function updateThemeButton() {
+    document.getElementById('themeToggleBtn').textContent = (currentEffectiveTheme() === 'dark') ? '라이트 모드' : '다크 모드';
+  }
+  function applyTheme(theme) {
+    if (theme === 'dark' || theme === 'light') {
+      document.documentElement.setAttribute('data-theme', theme);
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    updateThemeButton();
+  }
+  document.getElementById('themeToggleBtn').addEventListener('click', function () {
+    var next = (currentEffectiveTheme() === 'dark') ? 'light' : 'dark';
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+    applyTheme(next);
+  });
+  (function initTheme() {
+    var saved = null;
+    try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+    if (saved === 'dark' || saved === 'light') { applyTheme(saved); } else { updateThemeButton(); }
+  })();
 
   init();
 })();
