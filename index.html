@@ -247,10 +247,10 @@
     top: 0.7rem;
     right: 0.75rem;
     display: none;
-    gap: 0.35rem;
     z-index: 2;
   }
   .recipe.is-open .recipe-tools { display: flex; }
+  .recipe-tools > .tool-btn + .tool-btn { margin-left: 0.35rem; }
   .tool-btn {
     font-family: var(--font-body);
     font-size: 0.65rem;
@@ -269,7 +269,6 @@
     width: 100%;
     display: flex;
     align-items: center;
-    gap: 0.9rem;
     padding: 1.1rem 1.35rem;
     background: none;
     border: none;
@@ -290,6 +289,7 @@
     padding: 0.15rem 0.4rem;
     white-space: nowrap;
     flex-shrink: 0;
+    margin-right: 0.9rem;
   }
   .summary-text { flex: 1; min-width: 0; }
   .dish-name {
@@ -577,7 +577,6 @@
     .wrap { padding: 2rem 1rem 3rem; }
     .toolbar-row { flex-direction: column; align-items: stretch; }
     .toolbar-actions { justify-content: flex-start; }
-    .recipe-summary { gap: 0.6rem; }
     .recipe.is-open .recipe-summary { padding-right: 4.25rem; }
     .recipe-tools { top: 0.6rem; right: 0.6rem; }
     .modal-overlay { padding: 1.5rem 0.75rem; }
