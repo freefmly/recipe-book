@@ -138,24 +138,6 @@
     text-wrap: balance;
     letter-spacing: -0.01em;
   }
-  .book-sub {
-    color: var(--text-muted);
-    font-size: 1rem;
-    max-width: 60ch;
-  }
-  .book-usage {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-  }
-  .book-usage kbd {
-    font-family: var(--font-body);
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 0.05rem 0.4rem;
-    font-size: 0.78em;
-  }
-
   .toolbar-row {
     display: flex;
     justify-content: space-between;
@@ -605,8 +587,6 @@
   <header class="book-header">
     <span class="eyebrow">Home Kitchen · Recipe Collection</span>
     <h1 class="book-title">우리집 레시피북</h1>
-    <p class="book-sub">냉장고 앞에 붙여두고 바로 따라 할 수 있는 세계 각국 요리 모음. 재료를 확인하고, 순서는 번호만 따라가면 됩니다.</p>
-    <p class="book-usage">요리 이름을 누르면 재료와 만드는 법이 펼쳐지고, 그 안에서 <kbd>수정</kbd>·<kbd>삭제</kbd>로 직접 고치거나 지울 수 있어요. <kbd>카테고리 관리</kbd>에서 분류를 자유롭게 추가·수정·삭제할 수도 있어요. 이 링크를 아는 모두에게 같은 내용이 실시간으로 공유돼요.</p>
   </header>
 
   <div class="toolbar-row">
@@ -1191,6 +1171,7 @@
     var grid = document.getElementById('grid');
     grid.innerHTML = '';
     var list = recipes.filter(function (r) { return activeFilter === '전체' || r.region === activeFilter; });
+    list.sort(function (a, b) { return a.name.localeCompare(b.name, 'ko'); });
     if (list.length === 0) {
       var empty = document.createElement('p');
       empty.className = 'empty-state';
