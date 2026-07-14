@@ -13,6 +13,14 @@
     --region-asia: #A5741B;
     --region-eu: #7B3F56;
     --region-am: #A8431F;
+    --swatch-pine: #2F6F5E;
+    --swatch-gold: #A5741B;
+    --swatch-plum: #7B3F56;
+    --swatch-rust: #A8431F;
+    --swatch-slate: #3B5E7A;
+    --swatch-olive: #6B7A2A;
+    --swatch-maroon: #7A2A3B;
+    --swatch-cyan: #2A6B7A;
     --shadow: 0 1px 2px rgba(34,38,31,.06), 0 10px 26px -14px rgba(34,38,31,.22);
 
     --font-display: Georgia, "Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif;
@@ -33,6 +41,14 @@
       --region-asia: #E0A83E;
       --region-eu: #C97FA0;
       --region-am: #E2775A;
+      --swatch-pine: #6FBFA0;
+      --swatch-gold: #E0A83E;
+      --swatch-plum: #C97FA0;
+      --swatch-rust: #E2775A;
+      --swatch-slate: #7FB0D9;
+      --swatch-olive: #B9CC5E;
+      --swatch-maroon: #CC5E7F;
+      --swatch-cyan: #5EC2CC;
       --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.65);
     }
   }
@@ -48,6 +64,14 @@
     --region-asia: #E0A83E;
     --region-eu: #C97FA0;
     --region-am: #E2775A;
+    --swatch-pine: #6FBFA0;
+    --swatch-gold: #E0A83E;
+    --swatch-plum: #C97FA0;
+    --swatch-rust: #E2775A;
+    --swatch-slate: #7FB0D9;
+    --swatch-olive: #B9CC5E;
+    --swatch-maroon: #CC5E7F;
+    --swatch-cyan: #5EC2CC;
     --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.65);
   }
   :root[data-theme="light"] {
@@ -62,6 +86,14 @@
     --region-asia: #A5741B;
     --region-eu: #7B3F56;
     --region-am: #A8431F;
+    --swatch-pine: #2F6F5E;
+    --swatch-gold: #A5741B;
+    --swatch-plum: #7B3F56;
+    --swatch-rust: #A8431F;
+    --swatch-slate: #3B5E7A;
+    --swatch-olive: #6B7A2A;
+    --swatch-maroon: #7A2A3B;
+    --swatch-cyan: #2A6B7A;
     --shadow: 0 1px 2px rgba(34,38,31,.06), 0 10px 26px -14px rgba(34,38,31,.22);
   }
 
@@ -200,10 +232,6 @@
     height: 100%;
     background: var(--tab-color, var(--accent));
   }
-  .recipe[data-region="한식"]   { --tab-color: var(--region-han); }
-  .recipe[data-region="아시아"] { --tab-color: var(--region-asia); }
-  .recipe[data-region="유럽"]   { --tab-color: var(--region-eu); }
-  .recipe[data-region="아메리카"] { --tab-color: var(--region-am); }
   .recipe.is-open { grid-column: 1 / -1; }
 
   .recipe-tools {
@@ -481,8 +509,81 @@
   }
   #confirmText { color: var(--text-muted); font-size: 0.92rem; margin: 0; }
 
+  .chip-dot {
+    display: inline-block;
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+  .category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 320px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+  }
+  .category-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .cat-dot {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .cat-name { flex: 1; font-weight: 600; min-width: 0; }
+  .cat-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .category-form-box {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .category-form-box[hidden] { display: none; }
+  .swatch-picker {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem;
+  }
+  .swatch-option {
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    padding: 0;
+  }
+  .swatch-option[data-selected="true"] {
+    border-color: var(--text);
+  }
+  .manage-btn {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .manage-btn:hover { border-color: var(--accent); }
+
   @media print {
-    .filters, .add-btn, .recipe-tools, .modal-overlay { display: none; }
+    .filters, .add-btn, .manage-btn, .recipe-tools, .modal-overlay { display: none; }
     .recipe { break-inside: avoid; box-shadow: none; margin-bottom: 1rem; }
     .recipe-detail[hidden] { display: grid; }
     .grid { display: block; }
@@ -498,13 +599,14 @@
     <span class="eyebrow">Home Kitchen · Recipe Collection</span>
     <h1 class="book-title">우리집 레시피북</h1>
     <p class="book-sub">냉장고 앞에 붙여두고 바로 따라 할 수 있는 세계 각국 요리 모음. 재료는 체크하며 준비하고, 순서는 번호만 따라가면 됩니다.</p>
-    <p class="book-usage">요리 이름을 누르면 재료와 만드는 법이 펼쳐져요. 각 카드의 <kbd>수정</kbd>·<kbd>삭제</kbd>로 직접 고치거나 지울 수 있고, <kbd>+ 새 레시피 추가</kbd>로 우리집만의 레시피를 더할 수 있어요. 이 링크를 아는 모두에게 같은 내용이 실시간으로 공유돼요.</p>
+    <p class="book-usage">요리 이름을 누르면 재료와 만드는 법이 펼쳐져요. 각 카드의 <kbd>수정</kbd>·<kbd>삭제</kbd>로 직접 고치거나 지울 수 있고, <kbd>카테고리 관리</kbd>에서 분류를 자유롭게 추가·수정·삭제할 수 있어요. 이 링크를 아는 모두에게 같은 내용이 실시간으로 공유돼요.</p>
   </header>
 
   <div class="toolbar-row">
     <nav class="filters" id="filters"></nav>
     <div style="display:flex; gap:0.5rem;">
       <button type="button" class="btn-secondary" id="refreshBtn" style="padding:0.55rem 1rem; font-size:0.85rem;">새로고침</button>
+      <button type="button" class="manage-btn" id="openCategoryBtn">카테고리 관리</button>
       <button type="button" class="add-btn" id="openAddBtn">+ 새 레시피 추가</button>
     </div>
   </div>
@@ -520,13 +622,8 @@
     <form id="recipeForm">
       <div class="field-row">
         <div class="field">
-          <label for="f-region">지역(분류)</label>
-          <select id="f-region">
-            <option value="한식">한식</option>
-            <option value="아시아">아시아</option>
-            <option value="유럽">유럽</option>
-            <option value="아메리카">아메리카</option>
-          </select>
+          <label for="f-region">카테고리</label>
+          <select id="f-region"></select>
         </div>
         <div class="field">
           <label for="f-tag">원산지 태그</label>
@@ -582,13 +679,48 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="categoryOverlay" hidden>
+  <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="categoryTitle" style="max-width:480px">
+    <h2 id="categoryTitle">카테고리 관리</h2>
+    <div class="category-list" id="categoryList"></div>
+
+    <div class="category-form-box" id="categoryFormBox" hidden>
+      <div class="field">
+        <label for="cat-name">카테고리 이름</label>
+        <input type="text" id="cat-name">
+      </div>
+      <div class="field">
+        <label>색상</label>
+        <div class="swatch-picker" id="swatchPicker"></div>
+      </div>
+      <p id="categoryError" class="form-error" hidden></p>
+      <div class="modal-actions" style="border-top:none; padding-top:0; margin-top:0.5rem;">
+        <button type="button" class="btn-secondary" id="categoryFormCancelBtn">취소</button>
+        <button type="button" class="btn-primary" id="categoryFormSaveBtn">저장</button>
+      </div>
+    </div>
+
+    <button type="button" class="add-row-btn" id="addCategoryBtn">+ 카테고리 추가</button>
+    <div class="modal-actions">
+      <button type="button" class="btn-secondary" id="categoryCloseBtn">닫기</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function () {
   var SUPABASE_URL = 'https://pkmfoyibaldeglqciglc.supabase.co';
   var SUPABASE_KEY = 'sb_publishable_fbqUvQ7uMG68BanntNTY9Q_7pObcA8a';
   var REST_URL = SUPABASE_URL + '/rest/v1/recipes';
+  var CATEGORIES_URL = SUPABASE_URL + '/rest/v1/categories';
   var HEADERS = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' };
-  var REGION_ORDER = ['한식', '아시아', '유럽', '아메리카'];
+  var SWATCHES = ['pine', 'gold', 'plum', 'rust', 'slate', 'olive', 'maroon', 'cyan'];
+  var DEFAULT_CATEGORIES = [
+    { id: '한식', name: '한식', color: 'pine', sort_order: 1 },
+    { id: '아시아', name: '아시아', color: 'gold', sort_order: 2 },
+    { id: '유럽', name: '유럽', color: 'plum', sort_order: 3 },
+    { id: '아메리카', name: '아메리카', color: 'rust', sort_order: 4 }
+  ];
 
   var SEED_RECIPES = [
     { id: 'kimchi-fried-rice', region: '한식', tag: '한식', name: '김치볶음밥', time: '15분', servings: '2인분',
@@ -897,10 +1029,14 @@
   ];
 
   var recipes = [];
+  var categories = [];
+  var categoriesById = {};
   var activeFilter = '전체';
   var openIds = {};
   var editingId = null;
   var deletingId = null;
+  var editingCategoryId = null;
+  var deletingCategoryId = null;
 
   async function fetchRecipes() {
     var res = await fetch(REST_URL + '?select=*&order=created_at.asc', { headers: HEADERS });
@@ -946,17 +1082,63 @@
     });
     if (!res.ok) throw new Error('삭제 실패 (' + res.status + ')');
   }
+  async function fetchCategories() {
+    var res = await fetch(CATEGORIES_URL + '?select=*&order=sort_order.asc', { headers: HEADERS });
+    if (!res.ok) throw new Error('카테고리 불러오기 실패 (' + res.status + ')');
+    return res.json();
+  }
+  async function seedCategoriesIfEmpty() {
+    var rows = await fetchCategories();
+    if (rows.length > 0) return rows;
+    try {
+      var res = await fetch(CATEGORIES_URL, {
+        method: 'POST',
+        headers: Object.assign({}, HEADERS, { Prefer: 'return=minimal' }),
+        body: JSON.stringify(DEFAULT_CATEGORIES)
+      });
+      if (!res.ok && res.status !== 409) throw new Error('초기 카테고리 등록 실패 (' + res.status + ')');
+    } catch (e) { /* someone else may have seeded first; fall through to refetch */ }
+    return fetchCategories();
+  }
+  async function insertCategory(payload) {
+    var res = await fetch(CATEGORIES_URL, {
+      method: 'POST',
+      headers: Object.assign({}, HEADERS, { Prefer: 'return=minimal' }),
+      body: JSON.stringify([payload])
+    });
+    if (!res.ok) throw new Error('카테고리 저장 실패 (' + res.status + ')');
+  }
+  async function updateCategoryRemote(id, patch) {
+    var res = await fetch(CATEGORIES_URL + '?id=eq.' + encodeURIComponent(id), {
+      method: 'PATCH',
+      headers: HEADERS,
+      body: JSON.stringify(patch)
+    });
+    if (!res.ok) throw new Error('카테고리 저장 실패 (' + res.status + ')');
+  }
+  async function deleteCategoryRemote(id) {
+    var res = await fetch(CATEGORIES_URL + '?id=eq.' + encodeURIComponent(id), {
+      method: 'DELETE',
+      headers: HEADERS
+    });
+    if (!res.ok) throw new Error('카테고리 삭제 실패 (' + res.status + ')');
+  }
   function escapeHtml(str) {
     var div = document.createElement('div');
     div.textContent = str == null ? '' : String(str);
     return div.innerHTML;
   }
 
+  function rebuildCategoriesById() {
+    categoriesById = {};
+    categories.forEach(function (c) { categoriesById[c.id] = c; });
+  }
+
   function render() {
     renderFilters();
     renderGrid();
     var footer = document.getElementById('bookFooter');
-    footer.textContent = '우리집 레시피북 · ' + recipes.length + ' recipes, ' + REGION_ORDER.length + ' regions';
+    footer.textContent = '우리집 레시피북 · ' + recipes.length + ' recipes, ' + categories.length + ' categories';
   }
 
   function renderLoading() {
@@ -978,7 +1160,10 @@
   async function init() {
     renderLoading();
     try {
-      recipes = await seedIfEmpty();
+      var results = await Promise.all([seedIfEmpty(), seedCategoriesIfEmpty()]);
+      recipes = results[0];
+      categories = results[1];
+      rebuildCategoriesById();
     } catch (err) {
       renderError(err);
       return;
@@ -987,19 +1172,25 @@
   }
 
   function renderFilters() {
-    var counts = { '전체': recipes.length };
-    REGION_ORDER.forEach(function (r) {
-      counts[r] = recipes.filter(function (x) { return x.region === r; }).length;
-    });
     var bar = document.getElementById('filters');
     bar.innerHTML = '';
-    ['전체'].concat(REGION_ORDER).forEach(function (name) {
+
+    var allChip = document.createElement('button');
+    allChip.type = 'button';
+    allChip.className = 'chip';
+    allChip.dataset.active = (activeFilter === '전체') ? 'true' : 'false';
+    allChip.textContent = '전체 ' + recipes.length;
+    allChip.addEventListener('click', function () { activeFilter = '전체'; render(); });
+    bar.appendChild(allChip);
+
+    categories.forEach(function (cat) {
+      var count = recipes.filter(function (r) { return r.region === cat.id; }).length;
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'chip';
-      b.dataset.active = (name === activeFilter) ? 'true' : 'false';
-      b.textContent = name + ' ' + counts[name];
-      b.addEventListener('click', function () { activeFilter = name; render(); });
+      b.dataset.active = (cat.id === activeFilter) ? 'true' : 'false';
+      b.innerHTML = '<span class="chip-dot" style="background:var(--swatch-' + cat.color + ')"></span>' + escapeHtml(cat.name) + ' ' + count;
+      b.addEventListener('click', function () { activeFilter = cat.id; render(); });
       bar.appendChild(b);
     });
   }
@@ -1023,6 +1214,8 @@
     var article = document.createElement('article');
     article.className = 'recipe' + (isOpen ? ' is-open' : '');
     article.dataset.region = r.region;
+    var cat = categoriesById[r.region];
+    article.style.setProperty('--tab-color', 'var(--swatch-' + (cat ? cat.color : 'pine') + ')');
 
     var tools = document.createElement('div');
     tools.className = 'recipe-tools';
@@ -1096,7 +1289,11 @@
     document.getElementById('formError').hidden = true;
     editingId = recipe ? recipe.id : null;
     document.getElementById('formTitle').textContent = recipe ? '레시피 수정' : '새 레시피 추가';
-    document.getElementById('f-region').value = recipe ? recipe.region : '한식';
+    var regionSelect = document.getElementById('f-region');
+    regionSelect.innerHTML = categories.map(function (c) {
+      return '<option value="' + escapeHtml(c.id) + '">' + escapeHtml(c.name) + '</option>';
+    }).join('');
+    regionSelect.value = recipe ? recipe.region : (categories[0] ? categories[0].id : '');
     document.getElementById('f-tag').value = recipe ? recipe.tag : '';
     document.getElementById('f-name').value = recipe ? recipe.name : '';
     document.getElementById('f-time').value = recipe ? recipe.time : '';
@@ -1216,16 +1413,164 @@
     }
   });
 
+  function renderCategoryList() {
+    var list = document.getElementById('categoryList');
+    list.innerHTML = '';
+    categories.forEach(function (cat) {
+      var count = recipes.filter(function (r) { return r.region === cat.id; }).length;
+      var row = document.createElement('div');
+      row.className = 'category-row';
+
+      var dot = document.createElement('span');
+      dot.className = 'cat-dot';
+      dot.style.background = 'var(--swatch-' + cat.color + ')';
+
+      var name = document.createElement('span');
+      name.className = 'cat-name';
+      name.textContent = cat.name;
+
+      var countEl = document.createElement('span');
+      countEl.className = 'cat-count';
+      countEl.textContent = count + '개';
+
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button'; editBtn.className = 'tool-btn'; editBtn.textContent = '수정';
+      editBtn.addEventListener('click', function () { openCategoryForm(cat); });
+
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button'; delBtn.className = 'tool-btn danger'; delBtn.textContent = '삭제';
+      delBtn.addEventListener('click', async function () {
+        var categoryError = document.getElementById('categoryError');
+        categoryError.hidden = true;
+        var liveCount = recipes.filter(function (r) { return r.region === cat.id; }).length;
+        if (liveCount > 0) {
+          categoryError.textContent = '이 카테고리를 사용 중인 레시피가 ' + liveCount + '개 있어요. 레시피의 카테고리를 먼저 바꾸거나 삭제해주세요.';
+          categoryError.hidden = false;
+          return;
+        }
+        delBtn.disabled = true;
+        try {
+          await deleteCategoryRemote(cat.id);
+          categories = await fetchCategories();
+          rebuildCategoriesById();
+          if (activeFilter === cat.id) activeFilter = '전체';
+          renderCategoryList();
+          render();
+        } catch (err) {
+          categoryError.textContent = String((err && err.message) || err);
+          categoryError.hidden = false;
+        } finally {
+          delBtn.disabled = false;
+        }
+      });
+
+      row.appendChild(dot);
+      row.appendChild(name);
+      row.appendChild(countEl);
+      row.appendChild(editBtn);
+      row.appendChild(delBtn);
+      list.appendChild(row);
+    });
+  }
+
+  function renderSwatchPicker(selected) {
+    var picker = document.getElementById('swatchPicker');
+    picker.innerHTML = '';
+    SWATCHES.forEach(function (key) {
+      var opt = document.createElement('button');
+      opt.type = 'button';
+      opt.className = 'swatch-option';
+      opt.style.background = 'var(--swatch-' + key + ')';
+      opt.dataset.color = key;
+      opt.dataset.selected = (key === selected) ? 'true' : 'false';
+      opt.setAttribute('aria-label', key);
+      opt.addEventListener('click', function () {
+        Array.prototype.forEach.call(picker.querySelectorAll('.swatch-option'), function (el) {
+          el.dataset.selected = 'false';
+        });
+        opt.dataset.selected = 'true';
+      });
+      picker.appendChild(opt);
+    });
+  }
+
+  function openCategoryForm(cat) {
+    document.getElementById('categoryError').hidden = true;
+    editingCategoryId = cat ? cat.id : null;
+    document.getElementById('cat-name').value = cat ? cat.name : '';
+    renderSwatchPicker(cat ? cat.color : SWATCHES[0]);
+    document.getElementById('categoryFormBox').hidden = false;
+    document.getElementById('cat-name').focus();
+  }
+  function closeCategoryForm() {
+    document.getElementById('categoryFormBox').hidden = true;
+    editingCategoryId = null;
+  }
+
+  function openCategoryModal() {
+    closeCategoryForm();
+    renderCategoryList();
+    document.getElementById('categoryOverlay').hidden = false;
+  }
+  function closeCategoryModal() {
+    document.getElementById('categoryOverlay').hidden = true;
+  }
+
+  document.getElementById('openCategoryBtn').addEventListener('click', openCategoryModal);
+  document.getElementById('categoryCloseBtn').addEventListener('click', closeCategoryModal);
+  document.getElementById('categoryOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeCategoryModal();
+  });
+  document.getElementById('addCategoryBtn').addEventListener('click', function () { openCategoryForm(null); });
+  document.getElementById('categoryFormCancelBtn').addEventListener('click', closeCategoryForm);
+
+  document.getElementById('categoryFormSaveBtn').addEventListener('click', async function () {
+    var name = document.getElementById('cat-name').value.trim();
+    var categoryError = document.getElementById('categoryError');
+    categoryError.hidden = true;
+    if (!name) { document.getElementById('cat-name').focus(); return; }
+    var selectedSwatch = document.querySelector('#swatchPicker .swatch-option[data-selected="true"]');
+    var color = selectedSwatch ? selectedSwatch.dataset.color : SWATCHES[0];
+
+    var saveBtn = document.getElementById('categoryFormSaveBtn');
+    saveBtn.disabled = true;
+    saveBtn.textContent = '저장 중...';
+    try {
+      if (editingCategoryId) {
+        await updateCategoryRemote(editingCategoryId, { name: name, color: color });
+      } else {
+        var maxOrder = categories.reduce(function (m, c) { return Math.max(m, c.sort_order || 0); }, 0);
+        var id = 'c-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
+        await insertCategory({ id: id, name: name, color: color, sort_order: maxOrder + 1 });
+      }
+      categories = await fetchCategories();
+      rebuildCategoriesById();
+      closeCategoryForm();
+      renderCategoryList();
+      render();
+    } catch (err) {
+      categoryError.textContent = String((err && err.message) || err);
+      categoryError.hidden = false;
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = '저장';
+    }
+  });
+
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
       if (!document.getElementById('formOverlay').hidden) closeForm();
       if (!document.getElementById('confirmOverlay').hidden) closeConfirm();
+      if (!document.getElementById('categoryOverlay').hidden) closeCategoryModal();
     }
   });
 
   document.getElementById('refreshBtn').addEventListener('click', async function () {
     try {
-      recipes = await fetchRecipes();
+      var results = await Promise.all([fetchRecipes(), fetchCategories()]);
+      recipes = results[0];
+      categories = results[1];
+      rebuildCategoriesById();
       render();
     } catch (err) {
       renderError(err);
