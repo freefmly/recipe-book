@@ -1,6 +1,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>우리집 레시피북</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css">
 <style>
   :root {
     --bg: #EEEAE0;
@@ -25,8 +28,7 @@
     --shadow: 0 1px 2px rgba(34,38,31,.06), 0 10px 26px -14px rgba(34,38,31,.22);
 
     --font-display: Georgia, "Noto Serif KR", "Nanum Myeongjo", "Apple SD Gothic Neo", serif;
-    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-    --font-mono: ui-monospace, Menlo, Consolas, "D2Coding", "Apple SD Gothic Neo", monospace;
+    --font-body: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -122,7 +124,7 @@
     margin-bottom: 1.75rem;
   }
   .eyebrow {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.72rem;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -146,7 +148,7 @@
     color: var(--text-muted);
   }
   .book-usage kbd {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 4px;
@@ -173,7 +175,7 @@
     gap: 0.5rem;
   }
   .chip {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.78rem;
     letter-spacing: 0.03em;
     border: 1px solid var(--border);
@@ -190,7 +192,7 @@
     color: var(--accent-contrast);
   }
   .add-btn {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.8rem;
     background: var(--accent);
     color: var(--accent-contrast);
@@ -250,7 +252,7 @@
   }
   .recipe.is-open .recipe-tools { display: flex; }
   .tool-btn {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.65rem;
     letter-spacing: 0.02em;
     background: var(--bg);
@@ -278,7 +280,7 @@
   }
   .recipe.is-open .recipe-summary { padding-right: 5.5rem; }
   .tag {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.68rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -291,7 +293,7 @@
   }
   .summary-text { flex: 1; min-width: 0; }
   .dish-name {
-    font-family: var(--font-display);
+    font-family: var(--font-body);
     font-size: 1.2rem;
     font-weight: 700;
     margin: 0;
@@ -318,7 +320,7 @@
   }
 
   .recipe-detail h3 {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.72rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -340,7 +342,7 @@
     font-size: 0.92rem;
   }
   .qty {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-variant-numeric: tabular-nums;
     color: var(--tab-color, var(--accent));
     margin-right: 0.35rem;
@@ -362,7 +364,7 @@
   }
   .steps li::before {
     content: counter(step);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.78rem;
     flex-shrink: 0;
     width: 1.6rem;
@@ -390,7 +392,7 @@
     border-top: 1px solid var(--border);
     font-size: 0.8rem;
     color: var(--text-muted);
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
   }
 
   .modal-overlay {
@@ -415,13 +417,14 @@
     padding: 1.85rem;
   }
   .modal-panel h2 {
-    font-family: var(--font-display);
+    font-family: var(--font-body);
+    font-weight: 700;
     font-size: 1.35rem;
     margin: 0 0 1.25rem;
   }
   .field { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 1rem; }
   .field label {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.68rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -454,7 +457,7 @@
   .remove-row-btn:hover { color: var(--region-am); border-color: var(--region-am); }
   .add-row-btn {
     align-self: flex-start;
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.75rem;
     border: 1px dashed var(--border);
     background: none;
@@ -529,7 +532,7 @@
   }
   .cat-name { flex: 1; font-weight: 600; min-width: 0; }
   .cat-count {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.75rem;
     color: var(--text-muted);
     white-space: nowrap;
@@ -558,7 +561,7 @@
     border-color: var(--text);
   }
   .manage-btn {
-    font-family: var(--font-mono);
+    font-family: var(--font-body);
     font-size: 0.8rem;
     background: none;
     border: 1px solid var(--border);
@@ -1136,7 +1139,7 @@
     grid.innerHTML = '';
     var box = document.createElement('div');
     box.className = 'empty-state';
-    box.innerHTML = '데이터를 불러오지 못했어요.<br><span style="font-family:var(--font-mono);font-size:0.78rem;">' +
+    box.innerHTML = '데이터를 불러오지 못했어요.<br><span style="font-family:var(--font-body);font-size:0.78rem;">' +
       escapeHtml(String((err && err.message) || err)) +
       '</span><br><button type="button" class="btn-secondary" id="retryBtn" style="margin-top:0.75rem;">다시 시도</button>';
     grid.appendChild(box);
