@@ -122,7 +122,6 @@
   header.book-header {
     display: flex;
     flex-direction: column;
-    gap: 0.6rem;
     margin-bottom: 1.75rem;
   }
   .eyebrow {
@@ -136,7 +135,7 @@
     font-family: var(--font-display);
     font-weight: 700;
     font-size: clamp(2rem, 4vw, 2.75rem);
-    margin: 0;
+    margin: 0.6rem 0 0;
     text-wrap: balance;
     letter-spacing: -0.01em;
   }
@@ -150,21 +149,20 @@
   .filters {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
     order: 2;
     background: var(--tray-bg);
     border-radius: 14px;
-    padding: 0.6rem;
+    padding: 0.35rem;
     margin-top: 1rem;
   }
   .toolbar-actions {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
-    gap: 0.5rem;
     margin-left: auto;
     order: 1;
   }
+  .toolbar-actions > * { margin: 0.25rem; }
   .chip {
     font-family: var(--font-body);
     font-size: 0.8rem;
@@ -175,6 +173,7 @@
     padding: 0.55rem 1rem;
     border-radius: 999px;
     cursor: pointer;
+    margin: 0.25rem;
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
   }
   .chip[data-active="true"] {
@@ -434,10 +433,24 @@
   }
   .field textarea { resize: vertical; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
-  .dyn-list { display: flex; flex-direction: column; gap: 0.5rem; }
-  .dyn-row { display: flex; gap: 0.5rem; align-items: center; }
+  .dyn-list { display: flex; flex-direction: column; }
+  .dyn-row + .dyn-row { margin-top: 0.5rem; }
+  .dyn-row { display: flex; align-items: center; }
+  .dyn-row > * + * { margin-left: 0.5rem; }
   .dyn-row input { flex: 1; }
-  .dyn-row input.qty-input { flex: 0 0 32%; }
+  .dyn-row input.qty-amount { flex: 0 0 22%; }
+  .dyn-row select.qty-unit { flex: 0 0 5.2rem; }
+  .drag-handle {
+    flex-shrink: 0;
+    width: 1.3rem;
+    text-align: center;
+    color: var(--text-muted);
+    cursor: grab;
+    user-select: none;
+    font-size: 0.9rem;
+  }
+  .drag-handle:active { cursor: grabbing; }
+  .dyn-row.dragging, .category-row.dragging { opacity: 0.4; }
   .remove-row-btn {
     flex-shrink: 0;
     width: 1.9rem; height: 1.9rem;
@@ -464,11 +477,11 @@
   .modal-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 0.6rem;
     margin-top: 1.5rem;
     padding-top: 1.25rem;
     border-top: 1px solid var(--border);
   }
+  .modal-actions > * + * { margin-left: 0.6rem; }
   .btn-primary {
     background: var(--accent);
     color: var(--accent-contrast);
@@ -504,19 +517,19 @@
   .category-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
     max-height: 320px;
     overflow-y: auto;
     margin-bottom: 1rem;
   }
+  .category-row + .category-row { margin-top: 0.5rem; }
   .category-row {
     display: flex;
     align-items: center;
-    gap: 0.65rem;
     padding: 0.55rem 0.7rem;
     border: 1px solid var(--border);
     border-radius: 6px;
   }
+  .category-row > * + * { margin-left: 0.65rem; }
   .cat-dot {
     width: 0.75rem;
     height: 0.75rem;
@@ -540,9 +553,10 @@
   .swatch-picker {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.55rem;
+    margin: -0.275rem;
   }
   .swatch-option {
+    margin: 0.275rem;
     width: 1.9rem;
     height: 1.9rem;
     border-radius: 50%;
@@ -575,7 +589,8 @@
     .modal-overlay { padding: 1.5rem 0.75rem; }
     .modal-panel { padding: 1.35rem; }
     .field-row { grid-template-columns: 1fr; }
-    .dyn-row input.qty-input { flex: 0 0 40%; }
+    .dyn-row input.qty-amount { flex: 0 0 28%; }
+    .dyn-row select.qty-unit { flex: 0 0 4.6rem; }
   }
 
   @media print {
@@ -1239,17 +1254,59 @@
     return article;
   }
 
+  var QTY_UNITS = ['g', 'ml', '개', '큰술', '작은술'];
+  function parseQty(qty) {
+    qty = (qty || '').trim();
+    for (var i = 0; i < QTY_UNITS.length; i++) {
+      var unit = QTY_UNITS[i];
+      if (qty.slice(-unit.length) === unit) {
+        var amount = qty.slice(0, qty.length - unit.length).trim();
+        if (amount && /^[0-9]+(\.[0-9]+)?$/.test(amount)) {
+          return { amount: amount, unit: unit };
+        }
+      }
+    }
+    return { amount: qty, unit: '직접입력' };
+  }
+  function composeQty(amount, unit) {
+    amount = (amount || '').trim();
+    if (unit === '직접입력') return amount;
+    return amount + unit;
+  }
+  function makeDragHandle() {
+    var handle = document.createElement('span');
+    handle.className = 'drag-handle';
+    handle.draggable = true;
+    handle.setAttribute('aria-label', '순서 변경');
+    handle.textContent = '⠿';
+    return handle;
+  }
   function ingredientRow(qty, name) {
     var row = document.createElement('div');
     row.className = 'dyn-row';
+    var parsed = parseQty(qty);
     var nameInput = document.createElement('input');
-    nameInput.type = 'text'; nameInput.placeholder = '재료명'; nameInput.value = name || '';
-    var qtyInput = document.createElement('input');
-    qtyInput.type = 'text'; qtyInput.className = 'qty-input'; qtyInput.placeholder = '분량'; qtyInput.value = qty || '';
+    nameInput.type = 'text'; nameInput.className = 'ing-name'; nameInput.placeholder = '재료명'; nameInput.value = name || '';
+    var amountInput = document.createElement('input');
+    amountInput.type = 'text'; amountInput.className = 'qty-amount'; amountInput.value = parsed.amount;
+    var unitSelect = document.createElement('select');
+    unitSelect.className = 'qty-unit';
+    QTY_UNITS.concat(['직접입력']).forEach(function (u) {
+      var opt = document.createElement('option');
+      opt.value = u; opt.textContent = u;
+      if (u === parsed.unit) opt.selected = true;
+      unitSelect.appendChild(opt);
+    });
+    function syncAmountPlaceholder() {
+      amountInput.placeholder = (unitSelect.value === '직접입력') ? '예: 약간, 1/2개' : '수량';
+    }
+    syncAmountPlaceholder();
+    unitSelect.addEventListener('change', syncAmountPlaceholder);
     var rm = document.createElement('button');
     rm.type = 'button'; rm.className = 'remove-row-btn'; rm.textContent = '×';
     rm.addEventListener('click', function () { row.remove(); });
-    row.appendChild(nameInput); row.appendChild(qtyInput); row.appendChild(rm);
+    row.appendChild(makeDragHandle());
+    row.appendChild(nameInput); row.appendChild(amountInput); row.appendChild(unitSelect); row.appendChild(rm);
     return row;
   }
   function stepRow(text) {
@@ -1260,8 +1317,34 @@
     var rm = document.createElement('button');
     rm.type = 'button'; rm.className = 'remove-row-btn'; rm.textContent = '×';
     rm.addEventListener('click', function () { row.remove(); });
+    row.appendChild(makeDragHandle());
     row.appendChild(input); row.appendChild(rm);
     return row;
+  }
+  function enableRowDragReorder(containerId) {
+    var container = document.getElementById(containerId);
+    var draggingEl = null;
+    container.addEventListener('dragstart', function (e) {
+      var handle = e.target.closest('.drag-handle');
+      if (!handle) { e.preventDefault(); return; }
+      draggingEl = handle.closest('.dyn-row');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', '');
+      draggingEl.classList.add('dragging');
+    });
+    container.addEventListener('dragend', function () {
+      if (draggingEl) draggingEl.classList.remove('dragging');
+      draggingEl = null;
+    });
+    container.addEventListener('dragover', function (e) {
+      if (!draggingEl) return;
+      e.preventDefault();
+      var target = e.target.closest('.dyn-row');
+      if (!target || target === draggingEl || target.parentNode !== container) return;
+      var rect = target.getBoundingClientRect();
+      var before = (e.clientY - rect.top) < rect.height / 2;
+      container.insertBefore(draggingEl, before ? target : target.nextSibling);
+    });
   }
 
   function openForm(recipe) {
@@ -1302,6 +1385,8 @@
   document.getElementById('addStepBtn').addEventListener('click', function () {
     document.getElementById('f-steps').appendChild(stepRow(''));
   });
+  enableRowDragReorder('f-ingredients');
+  enableRowDragReorder('f-steps');
   document.getElementById('formCancelBtn').addEventListener('click', closeForm);
   document.getElementById('formOverlay').addEventListener('click', function (e) {
     if (e.target === this) closeForm();
@@ -1315,8 +1400,10 @@
     var tip = document.getElementById('f-tip').value.trim();
 
     var ingredients = Array.prototype.slice.call(document.querySelectorAll('#f-ingredients .dyn-row')).map(function (row) {
-      var inputs = row.querySelectorAll('input');
-      return { name: inputs[0].value.trim(), qty: inputs[1].value.trim() };
+      var name = row.querySelector('.ing-name').value.trim();
+      var amount = row.querySelector('.qty-amount').value.trim();
+      var unit = row.querySelector('.qty-unit').value;
+      return { name: name, qty: composeQty(amount, unit) };
     }).filter(function (ing) { return ing.name; });
 
     var steps = Array.prototype.slice.call(document.querySelectorAll('#f-steps .dyn-row')).map(function (row) {
@@ -1395,6 +1482,7 @@
       var count = recipes.filter(function (r) { return r.region === cat.id; }).length;
       var row = document.createElement('div');
       row.className = 'category-row';
+      row.dataset.categoryId = cat.id;
 
       var dot = document.createElement('span');
       dot.className = 'cat-dot';
@@ -1439,12 +1527,65 @@
         }
       });
 
+      row.appendChild(makeDragHandle());
       row.appendChild(dot);
       row.appendChild(name);
       row.appendChild(countEl);
       row.appendChild(editBtn);
       row.appendChild(delBtn);
       list.appendChild(row);
+    });
+  }
+
+  function enableCategoryDragReorder() {
+    var container = document.getElementById('categoryList');
+    var draggingEl = null;
+    container.addEventListener('dragstart', function (e) {
+      var handle = e.target.closest('.drag-handle');
+      if (!handle) { e.preventDefault(); return; }
+      draggingEl = handle.closest('.category-row');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', '');
+      draggingEl.classList.add('dragging');
+    });
+    container.addEventListener('dragover', function (e) {
+      if (!draggingEl) return;
+      e.preventDefault();
+      var target = e.target.closest('.category-row');
+      if (!target || target === draggingEl || target.parentNode !== container) return;
+      var rect = target.getBoundingClientRect();
+      var before = (e.clientY - rect.top) < rect.height / 2;
+      container.insertBefore(draggingEl, before ? target : target.nextSibling);
+    });
+    container.addEventListener('dragend', async function () {
+      if (!draggingEl) return;
+      draggingEl.classList.remove('dragging');
+      draggingEl = null;
+      var rows = Array.prototype.slice.call(container.querySelectorAll('.category-row'));
+      var updates = [];
+      rows.forEach(function (row, idx) {
+        var id = row.dataset.categoryId;
+        var newOrder = idx + 1;
+        var cat = categoriesById[id];
+        if (cat && cat.sort_order !== newOrder) {
+          updates.push(updateCategoryRemote(id, { sort_order: newOrder }));
+        }
+      });
+      if (updates.length === 0) return;
+      var categoryError = document.getElementById('categoryError');
+      try {
+        await Promise.all(updates);
+        categories = await fetchCategories();
+        rebuildCategoriesById();
+        renderCategoryList();
+        render();
+      } catch (err) {
+        categoryError.textContent = String((err && err.message) || err);
+        categoryError.hidden = false;
+        categories = await fetchCategories();
+        rebuildCategoriesById();
+        renderCategoryList();
+      }
     });
   }
 
@@ -1499,6 +1640,7 @@
   });
   document.getElementById('addCategoryBtn').addEventListener('click', function () { openCategoryForm(null); });
   document.getElementById('categoryFormCancelBtn').addEventListener('click', closeCategoryForm);
+  enableCategoryDragReorder();
 
   document.getElementById('categoryFormSaveBtn').addEventListener('click', async function () {
     var name = document.getElementById('cat-name').value.trim();
