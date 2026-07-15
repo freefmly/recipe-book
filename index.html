@@ -11,6 +11,7 @@
     --text: #22261F;
     --text-muted: #5B5F50;
     --border: rgba(34,38,31,0.14);
+    --tray-bg: rgba(34,38,31,0.055);
     --accent: #2F6F5E;
     --accent-contrast: #F8F5EE;
     --region-han: #2F6F5E;
@@ -38,6 +39,7 @@
       --text: #ECE7D8;
       --text-muted: #A7A891;
       --border: rgba(236,231,216,0.14);
+      --tray-bg: rgba(236,231,216,0.055);
       --accent: #6FBFA0;
       --accent-contrast: #10140D;
       --region-han: #6FBFA0;
@@ -61,6 +63,7 @@
     --text: #ECE7D8;
     --text-muted: #A7A891;
     --border: rgba(236,231,216,0.14);
+    --tray-bg: rgba(236,231,216,0.055);
     --accent: #6FBFA0;
     --accent-contrast: #10140D;
     --region-han: #6FBFA0;
@@ -83,6 +86,7 @@
     --text: #22261F;
     --text-muted: #5B5F50;
     --border: rgba(34,38,31,0.14);
+    --tray-bg: rgba(34,38,31,0.055);
     --accent: #2F6F5E;
     --accent-contrast: #F8F5EE;
     --region-han: #2F6F5E;
@@ -119,8 +123,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.6rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--border);
     margin-bottom: 1.75rem;
   }
   .eyebrow {
@@ -150,6 +152,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+    order: 2;
+    background: var(--tray-bg);
+    border-radius: 14px;
+    padding: 0.6rem;
   }
   .toolbar-actions {
     display: flex;
@@ -157,15 +163,16 @@
     justify-content: flex-end;
     gap: 0.5rem;
     margin-left: auto;
+    order: 1;
   }
   .chip {
     font-family: var(--font-body);
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     letter-spacing: 0.03em;
     border: 1px solid var(--border);
     background: var(--surface);
     color: var(--text);
-    padding: 0.4rem 0.85rem;
+    padding: 0.55rem 1rem;
     border-radius: 999px;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
@@ -488,8 +495,8 @@
 
   .chip-dot {
     display: inline-block;
-    width: 0.55rem;
-    height: 0.55rem;
+    width: 0.5rem;
+    height: 0.5rem;
     border-radius: 50%;
     margin-right: 0.4rem;
     vertical-align: middle;
