@@ -435,11 +435,13 @@
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
   .dyn-list { display: flex; flex-direction: column; }
   .dyn-row + .dyn-row { margin-top: 0.5rem; }
-  .dyn-row { display: flex; align-items: center; }
-  .dyn-row > * + * { margin-left: 0.5rem; }
-  .dyn-row input { flex: 1; }
-  .dyn-row input.qty-amount { flex: 0 0 22%; }
-  .dyn-row select.qty-unit { flex: 0 0 5.2rem; }
+  .dyn-row { display: flex; flex-wrap: wrap; align-items: center; }
+  .dyn-row > * { margin: 0.25rem 0 0.25rem 0.5rem; }
+  .dyn-row > *:first-child { margin-left: 0; }
+  .dyn-row input, .dyn-row select { min-width: 0; }
+  .dyn-row input { flex: 1 1 8rem; }
+  .dyn-row input.qty-amount { flex: 0 1 5.5rem; }
+  .dyn-row select.qty-unit { flex: 0 0 6.5rem; }
   .drag-handle {
     flex-shrink: 0;
     width: 1.3rem;
@@ -451,6 +453,26 @@
   }
   .drag-handle:active { cursor: grabbing; }
   .dyn-row.dragging, .category-row.dragging { opacity: 0.4; }
+  .move-btns { display: flex; flex-shrink: 0; }
+  .move-btns > * + * { margin-left: 0.25rem; }
+  .move-btn {
+    flex-shrink: 0;
+    width: 1.7rem;
+    height: 1.7rem;
+    padding: 0;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.65rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .move-btn:hover:not(:disabled) { color: var(--text); border-color: var(--accent); }
+  .move-btn:disabled { opacity: 0.35; cursor: default; }
   .remove-row-btn {
     flex-shrink: 0;
     width: 1.9rem; height: 1.9rem;
@@ -589,8 +611,6 @@
     .modal-overlay { padding: 1.5rem 0.75rem; }
     .modal-panel { padding: 1.35rem; }
     .field-row { grid-template-columns: 1fr; }
-    .dyn-row input.qty-amount { flex: 0 0 28%; }
-    .dyn-row select.qty-unit { flex: 0 0 4.6rem; }
   }
 
   @media print {
@@ -1281,6 +1301,26 @@
     handle.textContent = '⠿';
     return handle;
   }
+  function makeMoveButtons(row) {
+    var wrap = document.createElement('span');
+    wrap.className = 'move-btns';
+    var up = document.createElement('button');
+    up.type = 'button'; up.className = 'move-btn'; up.textContent = '▲';
+    up.setAttribute('aria-label', '위로 이동');
+    up.addEventListener('click', function () {
+      var prev = row.previousElementSibling;
+      if (prev) row.parentNode.insertBefore(row, prev);
+    });
+    var down = document.createElement('button');
+    down.type = 'button'; down.className = 'move-btn'; down.textContent = '▼';
+    down.setAttribute('aria-label', '아래로 이동');
+    down.addEventListener('click', function () {
+      var next = row.nextElementSibling;
+      if (next) row.parentNode.insertBefore(next, row);
+    });
+    wrap.appendChild(up); wrap.appendChild(down);
+    return wrap;
+  }
   function ingredientRow(qty, name) {
     var row = document.createElement('div');
     row.className = 'dyn-row';
@@ -1306,7 +1346,9 @@
     rm.type = 'button'; rm.className = 'remove-row-btn'; rm.textContent = '×';
     rm.addEventListener('click', function () { row.remove(); });
     row.appendChild(makeDragHandle());
-    row.appendChild(nameInput); row.appendChild(amountInput); row.appendChild(unitSelect); row.appendChild(rm);
+    row.appendChild(nameInput); row.appendChild(amountInput); row.appendChild(unitSelect);
+    row.appendChild(makeMoveButtons(row));
+    row.appendChild(rm);
     return row;
   }
   function stepRow(text) {
@@ -1318,7 +1360,9 @@
     rm.type = 'button'; rm.className = 'remove-row-btn'; rm.textContent = '×';
     rm.addEventListener('click', function () { row.remove(); });
     row.appendChild(makeDragHandle());
-    row.appendChild(input); row.appendChild(rm);
+    row.appendChild(input);
+    row.appendChild(makeMoveButtons(row));
+    row.appendChild(rm);
     return row;
   }
   function enableRowDragReorder(containerId) {
@@ -1475,10 +1519,32 @@
     }
   });
 
+  async function moveCategory(catId, direction) {
+    var idx = categories.findIndex(function (c) { return c.id === catId; });
+    var swapIdx = idx + direction;
+    if (idx === -1 || swapIdx < 0 || swapIdx >= categories.length) return;
+    var a = categories[idx];
+    var b = categories[swapIdx];
+    var categoryError = document.getElementById('categoryError');
+    categoryError.hidden = true;
+    try {
+      await Promise.all([
+        updateCategoryRemote(a.id, { sort_order: b.sort_order }),
+        updateCategoryRemote(b.id, { sort_order: a.sort_order })
+      ]);
+      categories = await fetchCategories();
+      rebuildCategoriesById();
+      renderCategoryList();
+      render();
+    } catch (err) {
+      categoryError.textContent = String((err && err.message) || err);
+      categoryError.hidden = false;
+    }
+  }
   function renderCategoryList() {
     var list = document.getElementById('categoryList');
     list.innerHTML = '';
-    categories.forEach(function (cat) {
+    categories.forEach(function (cat, idx) {
       var count = recipes.filter(function (r) { return r.region === cat.id; }).length;
       var row = document.createElement('div');
       row.className = 'category-row';
@@ -1495,6 +1561,20 @@
       var countEl = document.createElement('span');
       countEl.className = 'cat-count';
       countEl.textContent = count + '개';
+
+      var moveWrap = document.createElement('span');
+      moveWrap.className = 'move-btns';
+      var upBtn = document.createElement('button');
+      upBtn.type = 'button'; upBtn.className = 'move-btn'; upBtn.textContent = '▲';
+      upBtn.setAttribute('aria-label', '위로 이동');
+      upBtn.disabled = (idx === 0);
+      upBtn.addEventListener('click', function () { moveCategory(cat.id, -1); });
+      var downBtn = document.createElement('button');
+      downBtn.type = 'button'; downBtn.className = 'move-btn'; downBtn.textContent = '▼';
+      downBtn.setAttribute('aria-label', '아래로 이동');
+      downBtn.disabled = (idx === categories.length - 1);
+      downBtn.addEventListener('click', function () { moveCategory(cat.id, 1); });
+      moveWrap.appendChild(upBtn); moveWrap.appendChild(downBtn);
 
       var editBtn = document.createElement('button');
       editBtn.type = 'button'; editBtn.className = 'tool-btn'; editBtn.textContent = '수정';
@@ -1531,6 +1611,7 @@
       row.appendChild(dot);
       row.appendChild(name);
       row.appendChild(countEl);
+      row.appendChild(moveWrap);
       row.appendChild(editBtn);
       row.appendChild(delBtn);
       list.appendChild(row);
