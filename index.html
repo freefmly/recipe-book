@@ -302,6 +302,8 @@
     .recipe-detail { grid-template-columns: 1fr; }
   }
   .recipe-detail[hidden] { display: none; }
+  .detail-left { display: flex; flex-direction: column; }
+  .detail-left > * + * { margin-top: 1.5rem; }
 
   .form-error {
     color: var(--region-am);
@@ -662,6 +664,11 @@
         <label>재료</label>
         <div class="dyn-list" id="f-ingredients"></div>
         <button type="button" class="add-row-btn" id="addIngredientBtn">+ 재료 추가</button>
+      </div>
+      <div class="field">
+        <label>양념</label>
+        <div class="dyn-list" id="f-seasoning"></div>
+        <button type="button" class="add-row-btn" id="addSeasoningBtn">+ 양념 추가</button>
       </div>
       <div class="field">
         <label>만드는 법</label>
@@ -1061,7 +1068,7 @@
     var rows = await fetchRecipes();
     if (rows.length > 0) return rows;
     var payload = SEED_RECIPES.map(function (r) {
-      return { id: r.id, region: r.region, tag: r.tag, name: r.name, time: r.time, servings: r.servings, tip: r.tip || '', ingredients: r.ingredients, steps: r.steps };
+      return { id: r.id, region: r.region, tag: r.tag, name: r.name, time: r.time, servings: r.servings, tip: r.tip || '', ingredients: r.ingredients, seasoning: r.seasoning || [], steps: r.steps };
     });
     try {
       var res = await fetch(REST_URL, {
@@ -1262,9 +1269,15 @@
     var ingHtml = r.ingredients.map(function (ing) {
       return '<li>' + escapeHtml(ing.name) + '<span class="qty">' + escapeHtml(ing.qty) + '</span></li>';
     }).join('');
+    var seasoningHtml = (r.seasoning || []).map(function (ing) {
+      return '<li>' + escapeHtml(ing.name) + '<span class="qty">' + escapeHtml(ing.qty) + '</span></li>';
+    }).join('');
     var stepHtml = r.steps.map(function (s) { return '<li>' + escapeHtml(s) + '</li>'; }).join('');
     detail.innerHTML =
-      '<div class="ingredients"><h3>재료</h3><ul>' + ingHtml + '</ul></div>' +
+      '<div class="detail-left">' +
+        '<div class="ingredients"><h3>재료</h3><ul>' + ingHtml + '</ul></div>' +
+        (seasoningHtml ? '<div class="ingredients"><h3>양념</h3><ul>' + seasoningHtml + '</ul></div>' : '') +
+      '</div>' +
       '<div class="steps"><h3>만드는 법</h3><ol>' + stepHtml + '</ol></div>' +
       (r.tip ? '<p class="tip"><strong>Tip.</strong> ' + escapeHtml(r.tip) + '</p>' : '');
 
@@ -1274,15 +1287,17 @@
     return article;
   }
 
-  var QTY_UNITS = ['g', 'ml', '개', '큰술', '작은술'];
+  var QTY_UNITS = ['g', 'ml', '개', 'T', 't'];
+  var QTY_UNIT_ALIASES = [['T', 'T'], ['t', 't'], ['g', 'g'], ['ml', 'ml'], ['개', '개'], ['큰술', 'T'], ['작은술', 't']];
   function parseQty(qty) {
     qty = (qty || '').trim();
-    for (var i = 0; i < QTY_UNITS.length; i++) {
-      var unit = QTY_UNITS[i];
-      if (qty.slice(-unit.length) === unit) {
-        var amount = qty.slice(0, qty.length - unit.length).trim();
+    for (var i = 0; i < QTY_UNIT_ALIASES.length; i++) {
+      var suffix = QTY_UNIT_ALIASES[i][0];
+      var canonical = QTY_UNIT_ALIASES[i][1];
+      if (qty.slice(-suffix.length) === suffix) {
+        var amount = qty.slice(0, qty.length - suffix.length).trim();
         if (amount && /^[0-9]+(\.[0-9]+)?$/.test(amount)) {
-          return { amount: amount, unit: unit };
+          return { amount: amount, unit: canonical };
         }
       }
     }
@@ -1292,6 +1307,14 @@
     amount = (amount || '').trim();
     if (unit === '직접입력') return amount;
     return amount + unit;
+  }
+  function readIngredientRows(containerId) {
+    return Array.prototype.slice.call(document.querySelectorAll('#' + containerId + ' .dyn-row')).map(function (row) {
+      var name = row.querySelector('.ing-name').value.trim();
+      var amount = row.querySelector('.qty-amount').value.trim();
+      var unit = row.querySelector('.qty-unit').value;
+      return { name: name, qty: composeQty(amount, unit) };
+    }).filter(function (ing) { return ing.name; });
   }
   function makeDragHandle() {
     var handle = document.createElement('span');
@@ -1321,12 +1344,12 @@
     wrap.appendChild(up); wrap.appendChild(down);
     return wrap;
   }
-  function ingredientRow(qty, name) {
+  function ingredientRow(qty, name, namePlaceholder) {
     var row = document.createElement('div');
     row.className = 'dyn-row';
     var parsed = parseQty(qty);
     var nameInput = document.createElement('input');
-    nameInput.type = 'text'; nameInput.className = 'ing-name'; nameInput.placeholder = '재료명'; nameInput.value = name || '';
+    nameInput.type = 'text'; nameInput.className = 'ing-name'; nameInput.placeholder = namePlaceholder || '재료명'; nameInput.value = name || '';
     var amountInput = document.createElement('input');
     amountInput.type = 'text'; amountInput.className = 'qty-amount'; amountInput.value = parsed.amount;
     var unitSelect = document.createElement('select');
@@ -1406,7 +1429,14 @@
     var ingWrap = document.getElementById('f-ingredients');
     ingWrap.innerHTML = '';
     (recipe ? recipe.ingredients : [{ qty: '', name: '' }]).forEach(function (ing) {
-      ingWrap.appendChild(ingredientRow(ing.qty, ing.name));
+      ingWrap.appendChild(ingredientRow(ing.qty, ing.name, '재료명'));
+    });
+
+    var seasoningWrap = document.getElementById('f-seasoning');
+    seasoningWrap.innerHTML = '';
+    var seasoningList = (recipe && recipe.seasoning && recipe.seasoning.length) ? recipe.seasoning : [{ qty: '', name: '' }];
+    seasoningList.forEach(function (ing) {
+      seasoningWrap.appendChild(ingredientRow(ing.qty, ing.name, '양념명'));
     });
 
     var stepWrap = document.getElementById('f-steps');
@@ -1424,12 +1454,16 @@
 
   document.getElementById('openAddBtn').addEventListener('click', function () { openForm(null); });
   document.getElementById('addIngredientBtn').addEventListener('click', function () {
-    document.getElementById('f-ingredients').appendChild(ingredientRow('', ''));
+    document.getElementById('f-ingredients').appendChild(ingredientRow('', '', '재료명'));
+  });
+  document.getElementById('addSeasoningBtn').addEventListener('click', function () {
+    document.getElementById('f-seasoning').appendChild(ingredientRow('', '', '양념명'));
   });
   document.getElementById('addStepBtn').addEventListener('click', function () {
     document.getElementById('f-steps').appendChild(stepRow(''));
   });
   enableRowDragReorder('f-ingredients');
+  enableRowDragReorder('f-seasoning');
   enableRowDragReorder('f-steps');
   document.getElementById('formCancelBtn').addEventListener('click', closeForm);
   document.getElementById('formOverlay').addEventListener('click', function (e) {
@@ -1443,12 +1477,8 @@
     var region = document.getElementById('f-region').value;
     var tip = document.getElementById('f-tip').value.trim();
 
-    var ingredients = Array.prototype.slice.call(document.querySelectorAll('#f-ingredients .dyn-row')).map(function (row) {
-      var name = row.querySelector('.ing-name').value.trim();
-      var amount = row.querySelector('.qty-amount').value.trim();
-      var unit = row.querySelector('.qty-unit').value;
-      return { name: name, qty: composeQty(amount, unit) };
-    }).filter(function (ing) { return ing.name; });
+    var ingredients = readIngredientRows('f-ingredients');
+    var seasoning = readIngredientRows('f-seasoning');
 
     var steps = Array.prototype.slice.call(document.querySelectorAll('#f-steps .dyn-row')).map(function (row) {
       return row.querySelector('input').value.trim();
@@ -1462,12 +1492,12 @@
     try {
       if (editingId) {
         await updateRecipeRemote(editingId, {
-          region: region, name: name, tip: tip, ingredients: ingredients, steps: steps
+          region: region, name: name, tip: tip, ingredients: ingredients, seasoning: seasoning, steps: steps
         });
         openIds[editingId] = true;
       } else {
         var id = 'r-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
-        await insertRecipe({ id: id, region: region, tag: region, name: name, tip: tip, ingredients: ingredients, steps: steps });
+        await insertRecipe({ id: id, region: region, tag: region, name: name, tip: tip, ingredients: ingredients, seasoning: seasoning, steps: steps });
         openIds[id] = true;
       }
       recipes = await fetchRecipes();
