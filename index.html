@@ -292,18 +292,20 @@
 
   .recipe-detail {
     padding: 0 1.35rem 1.5rem;
-    display: grid;
-    grid-template-columns: minmax(200px, 260px) 1fr;
-    gap: 2rem;
     border-top: 1px solid var(--border);
     padding-top: 1.25rem;
   }
-  @media (max-width: 640px) {
-    .recipe-detail { grid-template-columns: 1fr; }
-  }
   .recipe-detail[hidden] { display: none; }
-  .detail-left { display: flex; flex-direction: column; }
-  .detail-left > * + * { margin-top: 1.5rem; }
+  .detail-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  .detail-top.single { grid-template-columns: 1fr; }
+  @media (max-width: 640px) {
+    .detail-top { grid-template-columns: 1fr; }
+  }
 
   .form-error {
     color: var(--region-am);
@@ -368,7 +370,6 @@
     justify-content: center;
   }
   .tip {
-    grid-column: 1 / -1;
     margin: 0.4rem 0 0;
     padding-top: 0.9rem;
     border-top: 1px dashed var(--border);
@@ -618,7 +619,7 @@
   @media print {
     .filters, .add-btn, .manage-btn, .recipe-tools, .modal-overlay { display: none; }
     .recipe { break-inside: avoid; box-shadow: none; margin-bottom: 1rem; }
-    .recipe-detail[hidden] { display: grid; }
+    .recipe-detail[hidden] { display: block; }
     .grid { display: block; }
   }
 
@@ -1274,7 +1275,7 @@
     }).join('');
     var stepHtml = r.steps.map(function (s) { return '<li>' + escapeHtml(s) + '</li>'; }).join('');
     detail.innerHTML =
-      '<div class="detail-left">' +
+      '<div class="detail-top' + (seasoningHtml ? '' : ' single') + '">' +
         '<div class="ingredients"><h3>재료</h3><ul>' + ingHtml + '</ul></div>' +
         (seasoningHtml ? '<div class="ingredients"><h3>양념</h3><ul>' + seasoningHtml + '</ul></div>' : '') +
       '</div>' +
